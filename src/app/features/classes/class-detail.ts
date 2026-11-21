@@ -173,6 +173,29 @@ export class ClassDetail {
   /** Labels ("2.1") of the subtasks assigned to the current user. */
   protected readonly myAssigned = computed(() => this.myAssignedItems().map((item) => item.label));
 
+  /** Labels of the subtasks the current user stands in for (backup), in order. */
+  protected readonly myBackups = computed(() => {
+    const me = this.currentUserId();
+    if (!me) {
+      return [];
+    }
+
+    const backed = new Set(
+      this.assignmentRows().filter((row) => row.backupUserId === me).map((row) => row.subtaskId),
+    );
+    const labels: string[] = [];
+    for (const set of this.sets()) {
+      for (const task of set.tasks) {
+        for (const subtask of task.subtasks) {
+          if (backed.has(subtask.id)) {
+            labels.push(`${task.taskNo}.${subtask.subtaskNo}`);
+          }
+        }
+      }
+    }
+    return labels;
+  });
+
   /** Giving up an assignment is possible while round 2 is open (others can still take it). */
   protected readonly canRelease = computed(
     () =>

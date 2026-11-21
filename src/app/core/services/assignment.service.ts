@@ -7,12 +7,14 @@ import { SupabaseService } from './supabase.service';
 export interface AssignmentRow {
   subtaskId: string;
   userId: string | null;
+  /** Stand-in in case the assigned person is absent (null = none). */
+  backupUserId: string | null;
   round: number;
 }
 
 /** Response of the `assign` Edge Function. */
 export interface AssignResult {
-  assignments: { subtaskId: string; studentId: string | null }[];
+  assignments: { subtaskId: string; studentId: string | null; backupStudentId: string | null }[];
   /** Round 1: ceil(subtasks / willing students). Round 2: null. */
   limitPerPerson: number | null;
 }
@@ -31,13 +33,13 @@ export class AssignmentService {
   async forClass(classId: string): Promise<AssignmentRow[]> {
     const { data, error } = await this.supabase.client
       .from('assignments')
-      .select('subtask_id, user_id, round')
+      .select('subtask_id, user_id, backup_user_id, round')
       .eq('class_id', classId);
 
     if (error) {
       throw error;
     }
-    return data.map((row) => ({ subtaskId: row.subtask_id, userId: row.user_id, round: row.round }));
+    return data.map((row) => ({ subtaskId: row.subtask_id, userId: row.user_id, backupUserId: row.backup_user_id, round: row.round }));
   }
 
   /**

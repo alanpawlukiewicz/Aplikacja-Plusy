@@ -68,6 +68,11 @@
             Nie przydzielono Ci żadnego podpunktu.
           }
         </p>
+        @if (myBackups().length > 0) {
+          <p class="mt-1 text-sm text-slate-700">
+            Zastępujesz (gdyby ktoś nie przyszedł): {{ myBackups().join(', ') }}
+          </p>
+        }
         <p class="mt-1 text-sm text-slate-500">
           To propozycja przydziału. Na zajęciach i tak decyduje prowadzący.
         </p>

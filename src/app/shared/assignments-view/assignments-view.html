@@ -9,16 +9,29 @@
           <ul class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
             @for (item of task.items; track item.id) {
               <li
-                class="flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm"
-                [class]="item.mine ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'"
+                class="flex flex-col gap-1 rounded-lg border px-3 py-2 text-sm"
+                [class]="
+                  item.mine
+                    ? 'border-emerald-300 bg-emerald-50'
+                    : item.mineBackup
+                      ? 'border-amber-300 bg-amber-50'
+                      : 'border-slate-200 bg-white'
+                "
               >
-                <span class="font-medium tabular-nums text-slate-900">{{ item.label }}</span>
-                @if (item.ownerName) {
-                  <span class="truncate text-slate-700" [class.font-medium]="item.mine">
-                    {{ item.mine ? 'Ty' : item.ownerName }}
+                <div class="flex items-center justify-between gap-3">
+                  <span class="font-medium tabular-nums text-slate-900">{{ item.label }}</span>
+                  @if (item.ownerName) {
+                    <span class="truncate text-slate-700" [class.font-medium]="item.mine">
+                      {{ item.mine ? 'Ty' : item.ownerName }}
+                    </span>
+                  } @else {
+                    <span class="text-slate-400">wolny</span>
+                  }
+                </div>
+                @if (item.backupName) {
+                  <span class="truncate text-right text-xs text-slate-500" [class.font-medium]="item.mineBackup">
+                    zastępca: {{ item.mineBackup ? 'Ty' : item.backupName }}
                   </span>
-                } @else {
-                  <span class="text-slate-400">wolny</span>
                 }
               </li>
             }

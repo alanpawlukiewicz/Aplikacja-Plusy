@@ -8,6 +8,9 @@ interface ItemView {
   label: string;
   ownerName: string | null;
   mine: boolean;
+  backupName: string | null;
+  /** The current user is the stand-in for this subtask. */
+  mineBackup: boolean;
 }
 
 interface TaskItems {
@@ -35,7 +38,7 @@ export class AssignmentsView {
   readonly currentUserId = input<string | null>(null);
 
   protected readonly view = computed<SetItems[]>(() => {
-    const owners = new Map(this.assignments().map((row) => [row.subtaskId, row.userId]));
+    const rows = new Map(this.assignments().map((row) => [row.subtaskId, row]));
     const names = this.names();
     const me = this.currentUserId();
 
@@ -46,12 +49,16 @@ export class AssignmentsView {
         taskNo: task.taskNo,
         items: task.subtasks.map((subtask) => {
           // A subtask without a row (e.g. added after the assignment) counts as free.
-          const ownerId = owners.get(subtask.id) ?? null;
+          const row = rows.get(subtask.id);
+          const ownerId = row?.userId ?? null;
+          const backupId = row?.backupUserId ?? null;
           return {
             id: subtask.id,
             label: `${task.taskNo}.${subtask.subtaskNo}`,
             ownerName: ownerId ? (names.get(ownerId) ?? 'Inna osoba') : null,
             mine: ownerId !== null && ownerId === me,
+            backupName: backupId ? (names.get(backupId) ?? 'Inna osoba') : null,
+            mineBackup: backupId !== null && backupId === me,
           };
         }),
       })),
